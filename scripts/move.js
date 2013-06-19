@@ -122,7 +122,7 @@ Box.prototype.disarm = function() {
 };
 
 Box.prototype.checkCollision = function(surface) {
-  var right = surface.getImageData(this.x + this.width, 0, 1, 480).data;
+  var right = surface.getImageData(this.x + this.width + 1, 0, 1, 480).data;
 
   for(var i=0; i<right.length; i += 4) {
     if(right[i] == 0 && right[i+1] == 170 && right[i+2] == 242) {
