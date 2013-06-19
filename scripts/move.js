@@ -174,7 +174,7 @@ function logError(error) {
 
 function drawStatic() {
   setInterval(function() {
-    document.querySelector(".cameraAdjustIn").value += 100/12;
+    document.querySelector(".cameraAdjustIn").value += 100 / 8;
   }, 500);
   
   setTimeout(function() {
@@ -191,7 +191,7 @@ function drawStatic() {
     } else {
       requestAnimationFrame(drawStatic);
     }
-  }, 6000);
+  }, 3000);
 }
 
 function draw() {
