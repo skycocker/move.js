@@ -19,3 +19,7 @@ q {
 #controlbox-wrapper {
   text-align: center;
 }
+.cameraAdjustIn {
+  position: absolute;
+  left: 40%;
+}
