@@ -3,6 +3,8 @@ move.js
 
 Event library for your body moves :)
 
+**Check out the [live demo](http://skycocker.github.io/move.js)**
+
 Usage
 -----
 
