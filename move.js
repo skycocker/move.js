@@ -39,6 +39,14 @@ var valueR = 0,
     valueG = 170,
     valueB = 242;
 
+//readyToMove event
+var readyToMove = new CustomEvent(
+  "readyToMove", {
+    bubbles: true,
+    cancelable: true
+  }
+);
+
 function initMoves() {
   navigator.getMedia({ video: true }, startStream, logError);
 }
@@ -67,6 +75,7 @@ function drawStatic() {
       setupBuffer(staticFrame.data);
       
       setTimeout(function() {
+        document.dispatchEvent(readyToMove);
         requestAnimationFrame(draw);
       }, 1000);
     } else {
