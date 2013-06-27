@@ -11,6 +11,7 @@ navigator.getMedia = navigator.getUserMedia ||
 var video = document.createElement("video");
 video.width = 640;
 video.height = 480;
+video.style.display = "none";
 document.body.appendChild(video);
 
 var width = video.width,
@@ -20,163 +21,23 @@ var staticDump = document.createElement("canvas");
     staticDump.width = width;
     staticDump.height = height;
 var staticCtx = staticDump.getContext("2d");
+    //vertical flip
+    staticCtx.translate(width, 0);
+    staticCtx.scale(-1, 1);
 
 var output = document.querySelector("#movejs-workspace"),
     ctx = output.getContext("2d");
+    //vertical flip
+    ctx.translate(width, 0);
+    ctx.scale(-1, 1);
 
-var controlbox = document.querySelector(".movejs-controlbox"),
-    controlboxCtx = controlbox.getContext("2d");
-    
 var buffer = new Uint8Array(width * height);
 
-//popup text
-var popup = "";
-function displayPopup() {
-  ctx.beginPath();
-  if(popup.length >= 40) {
-    ctx.font = "34px sans-serif";
-  } else {
-    ctx.font = "48px sans-serif";
-  }
-  ctx.fillStyle = "#356E00";
-  ctx.textAlign = 'center';
-  ctx.fillText(popup, 320, 50);
-  ctx.closePath();
-}
+var isLittleEndian = null;
 
-//boxSlide event
-var boxSlide = new CustomEvent (
-  "boxSlide", {
-    bubbles: true,
-    cancelable: true
-  }
-);
-
-//ball object
-function Ball(x, y, armed) {
-  this.x = x;
-  this.y = y;
-  this.r = 10;
-  this.d = this.r * 2; //diameter
-  this.armed = armed;
-  this.opacity = 0;
-  this.color = "rgba(204, 0, 71, " + this.opacity + ")";
-}
-
-Ball.prototype.arm = function() {
-  this.armed = true;
-  this.color = "rgba(204, 0, 71, 1)";
-};
-
-Ball.prototype.disarm = function() {
-  this.armed = false;
-  this.color = "#00E335";
-};
-
-Ball.prototype.redraw = function(surface) {
-  surface.fillStyle = this.color;
-  surface.beginPath();
-  surface.arc(this.x, this.y, this.r, Math.PI*2, false);
-  surface.closePath();
-  surface.fill();
-};
-
-Ball.prototype.checkCollision = function(surface) {
-  var right = surface.getImageData(this.x + this.r + 1, this.y - this.r - 1, 1, this.d).data;
-
-  for(var i=0; i<right.length; i+=4) {
-    if(right[i] == 0 && right[i+1] == 170 && right[i+2] == 242) {
-      if(this.x > 0 + this.r + 1) {
-        this.x -= 1;
-      }
-    }
-  }
-};
-
-Ball.prototype.step = function(surface) {
-  this.checkCollision(surface);
-
-    if(this.armed) {
-      if(this.opacity < 1) {
-        this.opacity += 0.1;
-        this.color = "rgba(204, 0, 71, " + this.opacity + ")";
-      }
-      if(this.x < 30) {
-        document.dispatchEvent(boxSlide);
-        this.disarm();
-      }
-    } else {
-      if(this.x < 75) {
-        this.x += 5;
-      }
-      if(this.x >= 75) {
-        this.arm();
-      }
-    }
-};
-//
-
-//box object
-function Box(x, width, armed) {
-  this.x = x;
-  this.width = width;
-  this.armed = armed;
-  this.opacity = 0;
-  this.color = "rgba(204, 0, 71, " + this.opacity + ")";
-}
-
-Box.prototype.redraw = function(surface) {
-  surface.beginPath();
-  surface.fillStyle = this.color;
-  surface.fillRect(this.x, 0, this.width, 480);
-  surface.closePath();
-};
-
-Box.prototype.arm = function() {
-  this.armed = true;
-  this.color = "#CC0047";
-};
-
-Box.prototype.disarm = function() {
-  this.armed = false;
-  this.color = "#00E335";
-};
-
-Box.prototype.checkCollision = function(surface) {
-  var right = surface.getImageData(this.x + this.width, 0, 1, 480).data;
-
-  for(var i=0; i<right.length; i += 4) {
-    if(right[i] == 0 && right[i+1] == 170 && right[i+2] == 242) {
-      if(this.width > 0) {
-        this.width -= 0.3;
-      }
-    }
-  }
-};
-
-Box.prototype.step = function(surface) {
-  this.checkCollision(surface);
-
-  if(this.armed) {
-    if(this.opacity < 1) {
-      this.opacity += 0.1;
-      this.color = "rgba(204, 0, 71, " + this.opacity + ")";
-    }
-    if(this.width < 60) {
-      this.disarm();
-      document.dispatchEvent(boxSlide);
-    }
-  } else {
-    if(this.width >= 99) {
-      this.arm();
-    } else {
-      this.width += 10;
-    }
-  }
-};
-//
-
-var boxLeft = new Box(0, 100, true);
+var valueR = 0,
+    valueG = 170,
+    valueB = 242;
 
 function initMoves() {
   navigator.getMedia({ video: true }, startStream, logError);
@@ -195,7 +56,7 @@ function logError(error) {
 
 function drawStatic() {
   setInterval(function() {
-    document.querySelector(".movejs-cameraAdjustIn").value += 100/12;
+    document.querySelector(".movejs-cameraAdjustIn").value += 100 / 8;
   }, 500);
   
   setTimeout(function() {
@@ -211,7 +72,7 @@ function drawStatic() {
     } else {
       requestAnimationFrame(drawStatic);
     }
-  }, 6000);
+  }, 3000);
 }
 
 function draw() {
@@ -220,30 +81,21 @@ function draw() {
   if(frame) {
     markLightnessChanges(frame.data);
     ctx.putImageData(frame, 0, 0);
-
-    markAreas(ctx);
     
-    if(drawControls) {
-      boxLeft.redraw(ctx);
-    }
-    
-    var tocopy = ctx.getImageData(0, 140, 150, 200);
-    controlboxCtx.putImageData(tocopy, 0, 0);
-    
-    if(drawControls) {
-      boxLeft.step(ctx);
-    }
-    displayPopup();
+    //flip for a second...
+    ctx.translate(width, 0);
+    ctx.scale(-1, 1);
+    //draw game frame
+    game.step();
+    //...aaand flip back
+    ctx.translate(width, 0);
+    ctx.scale(-1, 1);
   }
 
   requestAnimationFrame(draw);
 }
 
 function markAreas(onto) {
-  onto.fillStyle = "#1BAFE0";
-  onto.fillRect(150, 0, 10, 480);
-  onto.fillRect(490, 0, 10, 480);
-
   onto.fillStyle = "rgba(0, 209, 56, 0.2)";
   onto.fillRect(160, 0, 330, 480);
 }
@@ -265,33 +117,70 @@ function setupBuffer(data) {
 }
 
 function markLightnessChanges(data) {
+  var buf = new ArrayBuffer(data.length);
+  var buf8 = new Uint8ClampedArray(buf);
+  var outData = new Uint32Array(buf);
+  
+  if(isLittleEndian == null) {
+    outData[1] = 0x0a0b0c0d;
+    if(buf[4] === 0x0a && buf[5] === 0x0b && buf[6] === 0x0c && buf[7] === 0x0d) {
+      isLittleEndian = false;
+    } else {
+      isLittleEndian = true;
+    }
+  }
+  
   var limitY = height;
   if(!drawAll) {
     var limitX = 150;
   } else {
     var limitX = width;
   }
-
-  for(var y=0; y<limitY; ++y) {
-    for(var x=0; x<limitX; ++x) {
-      var rawOffset = y * width + x;
-      var index = rawOffset * 4;
-      
-      var current = lightnessValue(data[index], data[index+1], data[index+2]);
-
-      data[index] = 0;
-      data[index + 1] = 170;
-      data[index + 2] = 242;
-
-      data[index + 3] = 255 * lightnessHasChanged(rawOffset, current);
+  
+  if(isLittleEndian) {
+    for(var y=0; y<limitY; ++y) {
+      for(var x=0; x<limitX; ++x) {
+        var rawOffset = y * width + x;
+        var index = rawOffset * 4;
+        
+        var current = lightnessValue(data[index], data[index+1], data[index+2]);
+        
+        outData[rawOffset] = 
+            (255 * lightnessHasChanged(rawOffset, current) << 24) | //a
+            (valueB << 16) |                                        //b
+            (valueG << 8) |                                         //g
+            valueR;
+      }
+    }
+  } else {
+    for(var y=0; y<limitY; ++y) {
+      for(var x=0; x<limitX; ++x) {
+        var rawOffset = y * width + x;
+        var index = rawOffset * 4;
+        
+        var current = lightnessValue(data[index], data[index+1], data[index+2]);
+        
+        outData[rawOffset] = 
+            (0 << 24) |                                     //r
+            (170 << 16) |                                   //g
+            (242 << 8) |                                    //b
+            255 * lightnessHasChanged(rawOffset, current);  //a
+      }
     }
   }
+  
+  
+  data.set(buf8);
 }
 
 function lightnessHasChanged(index, value) {
-  return Math.abs(value - buffer[index]) >= 15;
+  return qAbs(value - buffer[index]) >= 15;
 }
 
 function lightnessValue(r, g, b) {
   return ( Math.min(r, g, b) + Math.max(r, g, b) ) / 255 * 50;
+}
+
+function qAbs(number) {
+  return (number ^ (number >> 31)) - (number >> 31);
 }
