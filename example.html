@@ -6,20 +6,11 @@
 </head>
 
 <body>
-  <progress class="movejs-cameraAdjustIn" max="100" value="0"></progress>
-  <canvas id="movejs-workspace" width="640" height="480"></canvas>
-  <canvas class="movejs-controlbox" width="150" height="200"></canvas>
+  <canvas id="move"></canvas>
 
   <script src="move.js"></script>
   <script type="text/javascript">
-    var drawControls = true;
-    var drawAll = true;
-    initMoves();
-    document.addEventListener("boxSlide", boxSlided, false);
-
-    function boxSlided() {
-      alert("the box has been slided!");
-    }
+    movejs.init();
   </script>
 </body>
 </html>
