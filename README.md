@@ -5,6 +5,13 @@ Control your device with your body movement
 
 **Check out the [live demo](http://skycocker.github.io/move.js)**
 
+Overview
+--------
+
+move.js is an utility for detecting humans or other moving objects and displaying them on a canvas in a chroma-key like way. It's actually pretty simple: it starts by waiting for the camera to adjust to the light, saves the visible picture to a buffer, waits few seconds and detects differences between the live image and the buffer.
+
+You can use it to create body controlled presentations, games and anything else you can think of.
+
 Usage
 -----
 
