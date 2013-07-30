@@ -43,3 +43,10 @@ Usage
         document.addEventListener("readyToMove", function() { alert('moving objects will be marked on the canvas!') }, false)
 
 And that's pretty much it. Feel free to send improvements and have fun! :)
+
+License
+-------
+
+Copyright 2013 Michał Siwek
+
+Released under the terms of [GNU General Public License (version 3 or later)](http://www.gnu.org/licenses/gpl.txt)

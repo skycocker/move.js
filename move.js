@@ -1,3 +1,11 @@
+/*
+move.js - control your device with your body movement
+url/latest source: https://github.com/skycocker/move.js
+
+Copyright 2013 Michał Siwek
+Released under the terms of GNU General Public License (version 3 or later) (http://www.gnu.org/licenses/gpl.txt)
+*/
+
 (function(window, document, navigator) {
   window.requestAnimationFrame = window.requestAnimationFrame ||
                                  window.msRequestAnimationFrame ||
