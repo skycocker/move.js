@@ -154,6 +154,12 @@ Released under the terms of GNU General Public License (version 3 or later) (htt
 
           var current = lightnessValue(data[index], data[index+1], data[index+2]);
 
+					if(move.humanFill.natural) {
+						move.humanFill.r = data[index];
+						move.humanFill.g = data[index+1];
+						move.humanFill.b = data[index+2];
+					}
+
           outData[rawOffset] =
               (255 * lightnessHasChanged(rawOffset, current) << 24) | //a
               (move.humanFill.b << 16) |                              //b
@@ -168,8 +174,14 @@ Released under the terms of GNU General Public License (version 3 or later) (htt
           var index = rawOffset * 4;
 
           var current = lightnessValue(data[index], data[index+1], data[index+2]);
-
-          outData[rawOffset] =
+					
+					if(move.humanFill.natural) {
+						move.humanFill.r = data[index];
+						move.humanFill.g = data[index+1];
+						move.humanFill.b = data[index+2];
+					}
+          
+					outData[rawOffset] =
               (move.humanFill.r << 24) |                     //r
               (move.humanFill.g << 16) |                     //g
               (move.humanFill.b << 8) |                      //b

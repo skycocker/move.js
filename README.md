@@ -28,7 +28,7 @@ Usage
   * `output [string]` - id of the canvas element you want the output to be displayed on (defaults to "move")
   * `width [integer]` - width of the image captured from the camera (defaults to 640 which is current biggest possibility)
   * `height [integer]` - height of the image captured from the camera (defaults to 480 which is current biggest possibility)
-  * `humanFill [property array object]` - color you want the detected objects to be filled with (defaults to { r: 0, g: 170, b: 242 }, which gives kind of light blue)
+  * `humanFill [property array object]` - color you want the detected objects to be filled with. You can also set it to { natural: true }, making the objects filled with their natural colors - this way you can simply remove the background (defaults to { r: 0, g: 170, b: 242 }, which gives kind of light blue)
   * `step [function]` - callback executed everytime a frame is rendered. Consider it something like a game loop - you can use it to draw something on your output canvas and/or detect its collision with human. This one does not default to anything, but you still don't have to provide it
   * `limitX [integer]` - number of X axis pixels checked for motion. Useful if you want to improve performance and need just some part of the area checked for movement (defaults to width)
   * `limitY [integer]` - same as above for Y axis (defaults to height)
