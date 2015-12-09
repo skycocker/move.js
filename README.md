@@ -3,7 +3,7 @@ move.js
 
 Control your device with your body movement
 
-**Check out the [live demo](http://skycocker.github.io/move.js)**
+**Check out the [live demo](https://skycocker.github.io/move.js)**
 
 Overview
 --------
